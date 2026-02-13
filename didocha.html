@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Music & Dares">
+
+<title>Music & Dares</title>
+
+<style>
+:root{
+  --bg1:#0f0f0f;
+  --bg2:#1c1c1e;
+  --card:rgba(255,255,255,0.08);
+  --text:white;
+}
+body.light{
+  --bg1:#f2f2f7;
+  --bg2:#ffffff;
+  --card:rgba(0,0,0,0.06);
+  --text:#111;
+}
+body{
+  margin:0;
+  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:var(--text);
+  transition:all 0.4s ease;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  justify-content:space-between;
+  align-items:center;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  position:relative;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  pointer-events:none;
+  z-index:-1;
+}
+.app{
+  width:92%;
+  max-width:420px;
+  margin-top:20px;
+  text-align:center;
+}
+h2{ margin-top:0; font-weight:600; }
+
+/* Buttons */
+button{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border:none;
+  border-radius:18px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  color:white;
+  transition:all 0.2s ease;
+}
+button:active{ transform:scale(0.95); }
+.primary{ background:linear-gradient(135deg,#0a84ff,#0066ff); }
+.green{ background:linear-gradient(135deg,#30d158,#28cd41); }
+.gray{ background:linear-gradient(135deg,#3a3a3c,#2c2c2e); }
+.toggle{ background:linear-gradient(135deg,#ff9f0a,#ff375f); }
+.said{ background: linear-gradient(135deg, #0a84ff, #0066ff); }
+.majda{ background: linear-gradient(135deg, #ff375f, #ff2d55); }
+.upload{ background: linear-gradient(135deg,#30d158,#28cd41); }
+
+/* Timer */
+#timer{ margin-top:10px; font-size:16px; font-weight:600; transition: color 0.3s; }
+#progress-container{
+  width:100%;
+  height:12px;
+  margin-top:6px;
+  background: rgba(255,255,255,0.2);
+  border-radius:10px;
+  overflow:hidden;
+  display:none;
+}
+#progress-bar{
+  height:100%;
+  width:100%;
+  background: linear-gradient(90deg, #ff375f, #ff9f0a);
+  transition: width 1s linear, background 0.3s;
+}
+
+/* Positions Display */
+#position-display{
+  margin-top:15px;
+  max-height:250px;
+  overflow:hidden;
+}
+#position-display img{
+  max-width:100%;
+  border-radius:15px;
+  margin-top:10px;
+  display:block;
+  transition: transform 0.3s;
+}
+
+/* Mood Selector */
+.mood-btn{
+  width:100px;
+  height:60px;
+  display:inline-flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  margin:5px 5px;
+  font-size:16px;
+  text-align:center;
+  line-height:1.2;
+  vertical-align:middle;
+  padding:5px;
+}
+
+/* Music controls fixed bottom */
+#music-controls{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:var(--card);
+  backdrop-filter:blur(20px);
+  padding:10px 0;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  box-shadow:0 -5px 15px rgba(0,0,0,0.3);
+}
+#music-controls button{
+  width:auto;
+  flex:1;
+  margin:0 5px;
+}
+
+/* Visualizer in bottom */
+#visualizer{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  height:50px;
+  margin-top:10px;
+}
+.bar{
+  width:8%;
+  background:linear-gradient(to top,#ff375f,#0a84ff);
+  border-radius:12px;
+  height:8px;
+  transition:height 0.1s ease;
+}
+</style>
+</head>
+
+<body>
+<!-- App Header -->
+<div class="app">
+  <h1 id="app-title">DIDOUCH & DIDOCHA FUN </h1>
+</div>
+
+<style>
+/* Animated Header */
+#app-title {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 20px 0 10px;
+  background: linear-gradient(90deg, #ff375f, #ff9f0a, #0a84ff, #30d158);
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbowText 6s linear infinite;
+  text-align: center;
+}
+
+@keyframes rainbowText {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+</style>
+
+<!-- Toggle Mode -->
+<div class="app">
+  <button class="toggle" onclick="toggleTheme()">🌙 / ☀ Toggle Mode</button>
+</div>
+
+<!-- Mood Selector -->
+<div class="app">
+  <h3>Choose Mood</h3>
+  <button class="toggle mood-btn" onclick="setMood('romantic')">🌹<br>Romantic</button>
+  <button class="toggle mood-btn" onclick="setMood('fun')">🎉<br>Fun</button>
+  <button class="toggle mood-btn" onclick="setMood('adventurous')">🔥<br>Adventurous</button>
+</div>
+
+<div class="app">
+  <h2>🖼️ Positions</h2>
+  <button class="said" onclick="showPosition('said')">Said Choose Position</button>
+  <button class="majda" onclick="showPosition('majda')">Majda Choose Positions</button>
+  <button class="upload" onclick="document.getElementById('positionUpload').click()">Add Positions</button>
+  <input type="file" id="positionUpload" accept="image/*" multiple style="display:none">
+  <div id="position-display"></div>
+
+  <h2>🎲 Dares</h2>
+  <button class="said" onclick="chooseSaidDare()">Said Dare</button>
+  <button class="majda" onclick="chooseMajdaDare()">Majda Dare</button>
+  <button class="green" onclick="addDare()">➕ Add Dare</button>
+
+  <div id="timer"></div>
+  <div id="progress-container"><div id="progress-bar"></div></div>
+</div>
+
+<!-- Music Controls Fixed Bottom -->
+<div id="music-controls">
+  <button class="green" onclick="uploadMusic()">➕ Add Songs</button>
+  <button class="primary" onclick="togglePlay()" id="playBtn">▶</button>
+  <button class="gray" onclick="prevSong()">⏮</button>
+  <button class="gray" onclick="nextSong()">⏭</button>
+  <button class="toggle" onclick="deleteAllSongs()">🗑 Delete All Songs</button>
+</div>
+
+<input type="file" id="fileInput" accept="audio/*" multiple style="display:none">
+<input type="file" id="moodSongInput" accept="audio/*" style="display:none">
+<audio id="endSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0b6df3d14c.mp3?filename=people-stop-rest-84947.mp3"></audio>
+
+<div id="visualizer">
+  <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  <div class="bar"></div><div class="bar"></div>
+</div>
+
+<script>
+// --- Haptic & Theme ---
+function haptic(type="light"){ if(navigator.vibrate){ if(type==="light") navigator.vibrate(10); if(type==="medium") navigator.vibrate(30); if(type==="heavy") navigator.vibrate([40,20,40]); } }
+function toggleTheme(){ document.body.classList.toggle("light"); haptic("medium"); }
+
+// --- Music Player ---
+let playlist = [];
+let currentIndex = 0;
+let audio = new Audio();
+let isPlaying = false;
+const playBtn = document.getElementById("playBtn");
+const fileInput = document.getElementById("fileInput");
+const moodSongInput = document.getElementById("moodSongInput");
+const bars = document.querySelectorAll(".bar");
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioContext.createAnalyser();
+analyser.fftSize = 64;
+const source = audioContext.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(audioContext.destination);
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+
+function uploadMusic(){ fileInput.click(); haptic("light"); }
+fileInput.addEventListener("change", function(e){
+  for(let file of e.target.files){
+    if(!playlist.find(p=>p.name===file.name)){
+      playlist.push({ name:file.name, url:URL.createObjectURL(file) });
+    }
+  }
+  if(playlist.length>0){ loadSong(playlist.length - e.target.files.length); }
+});
+function loadSong(index){ currentIndex=index; audio.src=playlist[index].url; }
+function togglePlay(){
+  if(!playlist.length){ alert("Add songs first!"); return; }
+  if(!isPlaying){ audioContext.resume(); audio.play(); playBtn.textContent="⏸"; isPlaying=true; animateVisualizer(); haptic("medium"); }
+  else{ audio.pause(); playBtn.textContent="▶"; isPlaying=false; haptic("light"); }
+}
+function nextSong(){ if(!playlist.length) return; currentIndex=(currentIndex+1)%playlist.length; loadSong(currentIndex); audio.play(); isPlaying=true; playBtn.textContent="⏸"; haptic("heavy"); }
+function prevSong(){ if(!playlist.length) return; currentIndex=(currentIndex+playlist.length)%playlist.length; loadSong(currentIndex); audio.play(); isPlaying=true; playBtn.textContent="⏸"; haptic("heavy"); }
+audio.addEventListener("ended",()=>{ nextSong(); });
+function animateVisualizer(){
+  if(!isPlaying) return;
+  requestAnimationFrame(animateVisualizer);
+  analyser.getByteFrequencyData(dataArray);
+  bars.forEach((b,i)=>{
+    let height = dataArray[i]/2 + Math.random()*10;
+    b.style.height = height+"px";
+  });
+}
+function deleteAllSongs(){
+  if(confirm("Delete all uploaded songs?")) {
+    playlist=[];
+    audio.pause();
+    audio.src="";
+    isPlaying=false;
+    playBtn.textContent="▶";
+    alert("All songs deleted!");
+  }
+}
+
+// --- Mood Songs ---
+let moodSongs = { romantic: null, fun: null, adventurous: null };
+function setMood(mood){
+  const body = document.body;
+  // set background image for all moods to your URL
+  body.style.backgroundImage = "url('https://lp-cms-production.imgix.net/2025-04/GettyImages-1450546518-16.9.jpg?auto=format,compress&q=72&w=1440&h=810&fit=crop')";
+  
+  if(!moodSongs[mood]){
+    moodSongInput.onchange = (e)=>{
+      if(e.target.files.length>0){
+        moodSongs[mood] = URL.createObjectURL(e.target.files[0]);
+        playMoodSong(mood);
+      }
+    };
+    moodSongInput.click();
+  } else {
+    playMoodSong(mood);
+  }
+
+  if(mood==='romantic'){
+    bars.forEach(b=>b.style.background='linear-gradient(to top,#FF6B6B,#FFD6A5)');
+    confettiEffect();
+  } else if(mood==='fun'){
+    bars.forEach(b=>b.style.background='linear-gradient(to top,#30D158,#FFD60A)');
+  } else if(mood==='adventurous'){
+    bars.forEach(b=>b.style.background='linear-gradient(to top,#FF375F,#0A84FF)');
+  }
+}
+
+function playMoodSong(mood){
+  audioContext.resume();
+  audio.src = moodSongs[mood];
+  audio.play();
+  isPlaying = true;
+  playBtn.textContent="⏸";
+  animateVisualizer();
+}
+
+// --- Dares ---
+let saidDares = ["Example Dare 1"];
+let majdaDares = ["Example Dare 2"];
+const endSound = document.getElementById("endSound");
+
+function addDare(){
+  let dare = prompt("Enter a new dare:");
+  if(dare && dare.trim()!==""){
+    let owner = prompt("Who is this dare for? (said/majda)").toLowerCase();
+    if(owner==="said") saidDares.push(dare.trim());
+    else if(owner==="majda") majdaDares.push(dare.trim());
+    else alert("Invalid owner! Use 'said' or 'majda'.");
+    haptic("light");
+  }
+}
+
+function chooseSaidDare(){ startTimer(); alert(saidDares[Math.floor(Math.random()*saidDares.length)]); }
+function chooseMajdaDare(){ startTimer(); alert(majdaDares[Math.floor(Math.random()*majdaDares.length)]); }
+
+function startTimer(){
+  let time=parseInt(prompt("Set timer seconds"));
+  if(isNaN(time)||time<=0) return;
+  const timer=document.getElementById("timer");
+  const bar=document.getElementById("progress-bar");
+  const container=document.getElementById("progress-container");
+  container.style.display="block";
+  bar.style.width="100%";
+  let remain=time;
+
+  const interval=setInterval(()=>{
+    remain--;
+    timer.textContent="⏱ "+remain+"s";
+
+    bar.style.width=(remain/time)*100+"%";
+    if(remain<=time*0.3){
+      timer.style.color="#FF3B30";
+      bar.style.background="linear-gradient(90deg,#FF3B30,#FF9500)";
+    } else {
+      timer.style.color="#FFFFFF";
+      bar.style.background="linear-gradient(90deg,#FF375F,#FF9F0A)";
+    }
+
+    if(remain<=0){
+      clearInterval(interval);
+      timer.textContent="Time's up!";
+      bar.style.width="0%";
+      endSound.play().catch(()=>{});
+      if(navigator.vibrate){ navigator.vibrate([200,100,200]); }
+    }
+  },1000);
+}
+
+// --- Positions ---
+let saidPositions = [];
+let majdaPositions = [];
+let positionInterval;
+const positionUpload = document.getElementById("positionUpload");
+positionUpload.addEventListener("change", function(e){
+  const files = e.target.files;
+  for(let file of files){
+    const url = URL.createObjectURL(file);
+    const name = file.name.toLowerCase();
+    if(name.includes("said")) saidPositions.push(url);
+    else if(name.includes("majda")) majdaPositions.push(url);
+  }
+  alert("Positions uploaded! Name files with 'said' or 'majda'.");
+});
+
+function showPosition(type){
+  clearInterval(positionInterval);
+  const display = document.getElementById("position-display");
+  let arr = type==="said"? saidPositions : majdaPositions;
+  if(arr.length===0){ alert("No positions for "+type+"! Upload first."); return; }
+  let index = 0;
+  display.innerHTML = `<img src="${arr[index]}">`;
+  positionInterval = setInterval(()=>{
+    index = (index + 1) % arr.length;
+    display.innerHTML = `<img src="${arr[index]}">`;
+  }, 3000);
+}
+
+// --- Confetti Effect ---
+function confettiEffect(){
+  const canvas = document.createElement('canvas');
+  canvas.id='confetti';
+  canvas.style.position='fixed';
+  canvas.style.top=0;
+  canvas.style.left=0;
+  canvas.style.width='100%';
+  canvas.style.height='100%';
+  canvas.style.pointerEvents='none';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  let confettis = Array.from({length:50},()=>({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*6+2,
+    color: `hsl(${Math.random()*360}, 100%, 50%)`,
+    speed: Math.random()+1
+  }));
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confettis.forEach(c=>{
+      ctx.beginPath();
+      ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+      ctx.fillStyle=c.color;
+      ctx.fill();
+      c.y+=c.speed;
+      if(c.y>canvas.height) c.y=0;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  setTimeout(()=>canvas.remove(),5000);
+}
+</script>
+</body>
+</html>
